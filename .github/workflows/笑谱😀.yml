@@ -31,4 +31,4 @@ jobs:
                   XP_refreshTOKEN: ${{ secrets.XP_refreshTOKEN }}
                   XP_CASH: ${{ secrets.XP_CASH }}
                   XP_live: ${{ secrets.XP_live }}
-                  SYNCURL: https://github.com/jonrea7/ZY/blob/ZIYE/Task/iboxpay.js
+                  SYNCURL: https://raw.githubusercontent.com/jonrea7/ZY/ZIYE/Task/iboxpay.js
