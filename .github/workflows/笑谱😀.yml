@@ -19,18 +19,18 @@ jobs:
     steps:
       - name: Checkout
         run: |
-          git clone https://github.com/jonrea7/ZY.git ~/App_auto
+          git clone https://github.com/jonrea7/ZY.git ~/ZY
       - name: Use Node.js 10.x
         uses: actions/setup-node@v1
         with:
           node-version: 10.x
       - name: npm install
         run: |
-          cd ~/App_auto
+          cd ~/ZY
           npm install
       - name: '运行 【笑谱】'
         run: |
-          cd ~/App_auto
+          cd ~/ZY
           node task/iboxpay.js
         env:
           XP_iboxpayHEADER: ${{ secrets.XP_iboxpayHEADER }}
