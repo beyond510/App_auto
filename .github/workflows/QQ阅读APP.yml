@@ -26,7 +26,5 @@ jobs:
               run: |
                   node onlyOneExecute.js
               env:
-                  TG_BOT_TOKEN: ${{ github.event.client_payload.TG_BOT_TOKEN2 || secrets.TG_BOT_TOKEN }}
-                  TG_USER_ID: ${{ github.event.client_payload.TG_USER_ID2 || secrets.TG_USER_ID }}
                   QQ_QQreadURL: ${{ secrets.QQ_QQreadURL }}
                   SYNCURL: https://github.com/jonrea7/ZY/blob/ZIYE/Task/QQread.js
