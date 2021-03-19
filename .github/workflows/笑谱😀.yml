@@ -6,7 +6,7 @@ name: 笑谱1😀
 on:
     workflow_dispatch:
     schedule:
-        - cron: "*/15 0-15 * * *"
+        - cron: "*/15 0-23 * * *"
     watch:
         types: [started]
 jobs:
