@@ -26,8 +26,8 @@ jobs:
               run: |
                   node onlyOneExecute.js
               env:
-                  TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN2 }}
-                  TG_USER_ID: ${{ secrets.TG_USER_ID2 }}
+                  TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+                  TG_USER_ID: ${{ secrets.TG_USER_ID }}
                   XP_refreshTOKEN: ${{ secrets.XP_refreshTOKEN }}
                   XP_iboxpayvideoHEADER: ${{ secrets.XP_iboxpayvideoHEADER }}
                   XP_iboxpayvideoBODY: ${{ secrets.XP_iboxpayvideoBODY }}
