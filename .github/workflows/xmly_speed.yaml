@@ -78,4 +78,4 @@ jobs:
 
                   TG_USER_ID: ${{ secrets.TG_USER_ID }}  #非必须 tg机器人userId
 
-                  SYNCURL: https://raw.githubusercontent.com/whyour/hundun/master/quanx/xmly_speed.py
+                  SYNCURL: https://raw.githubusercontent.com/jonrea7/App_auto/main/xmly_speed2.py
