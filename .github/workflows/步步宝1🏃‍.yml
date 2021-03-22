@@ -23,8 +23,8 @@ jobs:
               run: |
                   node onlyOneExecute.js
               env:
-                  TG_BOT_TOKEN: ${{ github.event.client_payload.TG_BOT_TOKEN2 || secrets.TG_BOT_TOKEN2 }}
-                  TG_USER_ID: ${{ github.event.client_payload.TG_USER_ID2 || secrets.TG_USER_ID2 }}
+                  TG_BOT_TOKEN: ${{ github.event.client_payload.TG_BOT_TOKEN2 || secrets.TG_BOT_TOKEN }}
+                  TG_USER_ID: ${{ github.event.client_payload.TG_USER_ID2 || secrets.TG_USER_ID }}
                   BBB_bububaoTOKEN: ${{ github.event.client_payload.secrets.BBB_bububaoTOKEN || secrets.BBB_bububaoTOKEN }}
                   BBB_CASH: ${{ github.event.client_payload.secrets.BBB_CASH || secrets.BBB_CASH }}
                   SYNCURL: https://github.com/jackpater/App_auto/raw/ziye/Task/bububao.js
