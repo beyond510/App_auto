@@ -41,6 +41,11 @@ jobs:
             YOUTH_REDBODY3: ${{ secrets.YOUTH_REDBODY3 }}  
             YOUTH_READTIMEBODY3: ${{ secrets.YOUTH_READTIMEBODY3 }}  
             YOUTH_WITHDRAWBODY3: ${{ secrets.YOUTH_READTIMEBODY3 }} 
+            YOUTH_HEADER4: ${{ secrets.YOUTH_HEADER4 }}
+            YOUTH_READBODY4: ${{ secrets.YOUTH_READBODY4 }}  
+            YOUTH_REDBODY4: ${{ secrets.YOUTH_REDBODY4 }}  
+            YOUTH_READTIMEBODY4: ${{ secrets.YOUTH_READTIMEBODY4 }}  
+            YOUTH_WITHDRAWBODY4: ${{ secrets.YOUTH_READTIMEBODY4 }} 
             BARK: ${{ secrets.BARK }}  #非必须 bark通知
             SCKEY: ${{ secrets.SCKEY }}  #非必须 server酱通知
             TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}  #非必须 tg机器人token
