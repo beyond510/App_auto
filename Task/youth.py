@@ -774,7 +774,7 @@ def run():
   print(content)
 
   # 每天 23:00 发送消息推送
-   if True:            
+  if True:            
   #if beijing_datetime.hour == 23 and beijing_datetime.minute >= 0 and beijing_datetime.minute < 5:
     send(title=title, content=result)
   elif not beijing_datetime.hour == 23:
