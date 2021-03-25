@@ -670,7 +670,7 @@ def run():
     withdrawBody = account.get('YOUTH_WITHDRAWBODY')
     shareBody = account.get('YOUTH_SHAREBODY')
     startBody = account.get('YOUTH_STARTBODY')
-    rotaryBody = f'{headers["Referer"].split("&")[15]}&{headers["Referer"].split("&")[8]}'
+    #rotaryBody = f'{headers["Referer"].split("&")[15]}&{headers["Referer"].split("&")[8]}'
 
     if startBody:
       startApp(headers=headers, body=startBody)
