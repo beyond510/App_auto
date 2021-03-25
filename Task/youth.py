@@ -26,6 +26,8 @@ cookies1 = {
   'YOUTH_STARTBODY': 'access=4G&app_version=2.0.2&channel=80000000&channel_code=80000000&cid=80000000&client_version=2.0.2&device_brand=iphone&device_id=51265872&device_model=iPhone&device_platform=iphone&device_type=iphone&isnew=1&mobile_type=2&net_type=2&openudid=cab4763a0231cf825e2ead822a01d935&os_version=12.0.1&phone_code=cab4763a0231cf825e2ead822a01d935&phone_network=4G&platform=3&request_time=1616428175&resolution=750x1334&sm_device_id=202103222311029d92c94c69fb00e2250a8bae26674b8001310a30873a4112&szlm_ddid=D2FV3JdzUZPHoJS8Qs%2Bz1eeXVZeR/dxu7Tt6UZzFTN47wX8a&time=1616428175&token=6fa1f36321b58aacc546aee22cd23bc4&uid=51613860&uuid=cab4763a0231cf825e2ead822a01d935'}
 cookies2 = {}
 
+cookies3 = {}
+
 COOKIELIST = [cookies1,]  # 多账号准备
 
 # ac读取环境变量
