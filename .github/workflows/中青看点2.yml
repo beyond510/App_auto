@@ -23,7 +23,7 @@ jobs:
 
       - name: 'run 中青阅读'
         # youth_read.py目录自己修改
-        run: python3 Task/youth.py
+        run: python3 Task/youth2.py
         # 目前最大5个账号，可按格式继续填写
         env: 
             YOUTH_HEADER: ${{ secrets.YOUTH_HEADER2 }}  #非必须 账号2 body2
