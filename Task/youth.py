@@ -782,5 +782,5 @@ def run():
   else:
     print('未在规定的时间范围内\n')
 
- if __name__ == '__main__':
+if __name__ == '__main__':
     run()
