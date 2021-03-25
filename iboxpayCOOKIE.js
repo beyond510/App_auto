@@ -15,7 +15,7 @@ boxjs链接  https://raw.githubusercontent.com/6Svip120apk69/gitee_q8qsTAUA_cThx
 把每一个ck在分别``里面填写，多账号换行 
 */
 
-modulees = 1 //1 选择方式一 3 选择方式三
+modulees = 3 //1 选择方式一 3 选择方式三
 
 
 
