@@ -28,6 +28,10 @@ cookies2 = {}
 
 cookies3 = {}
 
+cookies4 = {}
+
+cookies5 = {}
+
 COOKIELIST = [cookies1,]  # 多账号准备
 
 # ac读取环境变量
