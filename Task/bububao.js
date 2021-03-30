@@ -1,8 +1,8 @@
 /* ziye 
-github地址 https://github.com/ziye66666
+github地址 https://github.com/6Svip120apk69
 TG频道地址  https://t.me/ziyescript
 TG交流群   https://t.me/joinchat/AAAAAE7XHm-q1-7Np-tF3g
-boxjs链接  https://raw.githubusercontent.com/ziye66666/JavaScript/main/Task/ziye.boxjs.json
+boxjs链接  https://raw.githubusercontent.com/6Svip120apk69/gitee_q8qsTAUA_cThxc1RBVUE/main/Task/ziye.boxjs.json
 
 转载请备注个名字，谢谢
 
@@ -20,6 +20,9 @@ boxjs链接  https://raw.githubusercontent.com/ziye66666/JavaScript/main/Task/zi
 3.3-2 调整刮奖机制 分3个时间段刮奖
 3.4 取消限速
 3.5 优化提现
+3.8 替换为循环获取ck
+3.13 修复0.3提现
+3.23 设置CASH为1000以上时则在23.59分执行1秒的循环提现，以此类推
 
 ⚠️ 时间设置    0,30 0-23 * * *    每天 35次以上就行   
 
@@ -49,17 +52,17 @@ hostname=bububao.duoshoutuan.com,
 
 ############## 圈x
 #步步宝获取TOKEN
-https:\/\/bububao\.duoshoutuan\.com\/user\/* url script-request-header https://raw.githubusercontent.com/ziye66666/JavaScript/main/Task/bububao.js
+https:\/\/bububao\.duoshoutuan\.com\/user\/* url script-request-header https://raw.githubusercontent.com/6Svip120apk69/gitee_q8qsTAUA_cThxc1RBVUE/main/Task/bububao.js
 
 ############## loon
 #步步宝获取TOKEN
-http-response https:\/\/bububao\.duoshoutuan\.com\/user\/* script-path=https://raw.githubusercontent.com/ziye66666/JavaScript/main/Task/bububao.js, requires-body=1,max-size=0, tag=步步宝获取TOKEN
+http-response https:\/\/bububao\.duoshoutuan\.com\/user\/* script-path=https://raw.githubusercontent.com/6Svip120apk69/gitee_q8qsTAUA_cThxc1RBVUE/main/Task/bububao.js, requires-body=1,max-size=0, tag=步步宝获取TOKEN
 
 ############## surge
 #步步宝获取TOKEN
-步步宝获取TOKEN = type=http-response,pattern=https:\/\/bububao\.duoshoutuan\.com\/user\/*,script-path=https://raw.githubusercontent.com/ziye66666/JavaScript/main/Task/bububao.js
+步步宝获取TOKEN = type=http-response,pattern=https:\/\/bububao\.duoshoutuan\.com\/user\/*,script-path=https://raw.githubusercontent.com/6Svip120apk69/gitee_q8qsTAUA_cThxc1RBVUE/main/Task/bububao.js
 */
-
+GXRZ = '3.23 设置CASH为1000则在23.59分执行1秒的50元循环提现，以此类推'
 const $ = Env("步步宝");
 $.idx = ($.idx = ($.getval('bububaoSuffix') || '1') - 1) > 0 ? ($.idx + 1 + '') : ''; // 账号扩展字符
 const notify = $.isNode() ? require("./sendNotify") : ``;
@@ -67,7 +70,7 @@ const COOKIE = $.isNode() ? require("./bububaoCOOKIE") : ``;
 const logs = 0; // 0为关闭日志，1为开启
 const notifyttt = 1 // 0为关闭外部推送，1为12 23 点外部推送
 const notifyInterval = 2; // 0为关闭通知，1为所有通知，2为12 23 点通知  ， 3为 6 12 18 23 点通知 
-$.message = '', COOKIES_SPLIT = '', CASH = '', ddtime = '';
+$.message = '', COOKIES_SPLIT = '', CASH = '1000', ddtime = '';
 CZ = 10
 const bububaotokenArr = [];
 let bububaotokenVal = ``;
@@ -134,11 +137,39 @@ function GetCookie() {
     }
     if ($request && $request.url.indexOf("profile") >= 0) {
         const bububaotokenVal = $request.headers.tokenstr;
-        if (bububaotokenVal) $.setdata(bububaotokenVal, "bububaotoken" + $.idx);
-        $.log(
-            `[${$.name + $.idx}] 获取bububaotokenVal✅: 成功,bububaotokenVal: ${bububaotokenVal}`
-        );
-        $.msg($.name + $.idx, `获取bububaotokenVal: 成功🎉`, ``);
+
+        if (bububaotokenVal) {
+            cookie()
+
+            function cookie() {
+                bodys = $.getdata('bububaotoken' + $.idx);
+                if (bodys) {
+                    if (bodys.indexOf(bububaotokenVal) >= 0) {
+                        $.log(
+                            `[${$.name + $.idx}] bububaotokenVal已存在✅: bububaotokenVal: ${bububaotokenVal}`
+                        );
+                        $.msg($.name + $.idx, `bububaotokenVal已存在: 🎉`, ``);
+                        $.done();
+                    } else if ($.idx == '') {
+                        $.idx = 2
+                        cookie()
+                    } else {
+                        $.idx = $.idx + 1
+                        cookie()
+                    }
+                } else {
+                    $.setdata(bububaotokenVal, "bububaotoken" + $.idx);
+                    $.log(
+                        `[${$.name + $.idx}] 获取bububaotokenVal✅: 成功,bububaotokenVal: ${bububaotokenVal}`
+                    );
+                    $.msg($.name + $.idx, `获取bububaotokenVal: 成功🎉`, ``);
+
+                    $.done();
+                };
+
+            }
+
+        }
     }
 }
 console.log(
@@ -250,9 +281,12 @@ if (isGetCookie) {
     $.done();
 } else {
     !(async () => {
+
         await all();
+
         await $.wait(1000)
         await msgShow();
+
     })()
     .catch((e) => {
             $.log('', `❌ ${$.name}, 失败! 原因: ${e}!`, '')
@@ -280,15 +314,13 @@ async function all() {
             bububaotokenVal = bububaotokenArr[i];
         }
         header = {
-            'store': `appstore`,
             'tokenstr': `${bububaotokenVal}`,
-            'Connection': `keep-alive`,
-            'Accept-Encoding': `gzip, deflate, br`,
-            'version': `10`,
             'idfa': ``,
+            'ini': `21`,
+            'store': `0`,
             'Content-Type': `application/x-www-form-urlencoded`,
-            'User-Agent': `BBB/132 CFNetwork/1206 Darwin/20.1.0`,
-            'platform': `2`,
+            'platform': `1`,
+            'version': `18`,
             'imei': ``,
             'Cookie': ``,
             'Host': `bububao.duoshoutuan.com`,
@@ -296,34 +328,54 @@ async function all() {
             'Accept': `*/*`
         };
         O = (`${$.name + (i + 1)}🔔`);
-        await console.log(`-------------------------\n\n🔔开始运行【${$.name+(i+1)}】`)
-        let cookie_is_live = await user(); //用户名
-        if (!cookie_is_live) {
-            continue;
+
+
+        if (CASH >= 1000&&nowTimes.getHours() === 23&&nowTimes.getMinutes() == 59) {
+            A = Date.now()
+            B = Date.now() + CASH
+            C= daytime()+86400000
+            while (Date.now() <= B) {
+              if (Date.now() >= C&&Date.now() <= C+1) {
+                CASH = 50
+                 tixian()
+             }
+         }
+
+        } else {
+            await console.log(`-------------------------\n\n🔔开始运行【${$.name+(i+1)}】`)
+            let cookie_is_live = await user(); //用户名
+            if (!cookie_is_live) {
+                continue;
+            }
+            //await userjinbi() //收益记录
+            if (CZ >= 10) {
+                await help_index() //助力活动
+                await home() //首页信息
+                await jindan_click() //首页金蛋
+                await sign_html() //签到
+                await dk_info() //打卡
+                await cy_info() //答题
+                await water_info() //喝水
+                await sleep_info() //睡觉
+                await ggk() //刮刮卡
+                await $.wait(8000)
+                await lucky() //转盘抽奖
+                await $.wait(1000)
+                await lucky() //转盘抽奖
+                await $.wait(1000)
+                await lucky() //转盘抽奖
+                await $.wait(1000)
+                await h5_list() //看看赚
+                await news() //看文章
+                await renwu() //赚赚任务
+                await tixian_html() //提现
+            }
+
+            console.log(`${GXRZ}\n`);
+            $.message += `${GXRZ}\n`
+
         }
-        //await userjinbi() //收益记录
-        if (CZ >= 10) {
-            await help_index() //助力活动
-            await home() //首页信息
-            await jindan_click() //首页金蛋
-            await sign_html() //签到
-            await dk_info() //打卡
-            await cy_info() //答题
-            await water_info() //喝水
-            await sleep_info() //睡觉
-            await ggk() //刮刮卡
-            await $.wait(8000)
-            await lucky() //转盘抽奖
-            await $.wait(1000)
-            await lucky() //转盘抽奖
-            await $.wait(1000)
-            await lucky() //转盘抽奖
-            await $.wait(1000)
-            await h5_list() //看看赚
-            await news() //看文章
-            await renwu() //赚赚任务
-            await tixian_html() //提现
-        }
+
     }
 }
 //通知
@@ -356,7 +408,7 @@ function user(timeout = 0) {
             }
             $.post(url, async (err, resp, data) => {
                 try {
-                    if (logs) $.log(`${O}, 用户名🚩: ${data}`);
+                    if (logs) $.log(`${O}, 用户名🚩: ${decodeUnicode(data)}`);
                     $.user = JSON.parse(data);
                     if ($.user.uid) {
                         console.log(`\n${O}\n========== ${$.user.username} ==========\n微信绑定：${$.user.wx_username},今日收益：${$.user.day_jinbi/10000}元\n现金余额：${$.user.money}元,累计收益：${$.user.leiji_jinbi/10000}元,今日步数：${$.user.steps}步\n`)
@@ -392,7 +444,7 @@ function userjinbi(timeout = 0) {
                 }
                 $.post(url, async (err, resp, data) => {
                     try {
-                        if (logs) $.log(`${O}, 收益记录🚩: ${data}`);
+                        if (logs) $.log(`${O}, 收益记录🚩: ${decodeUnicode(data)}`);
                         $.userjinbi = JSON.parse(data);
 
                         if ($.userjinbi && $.userjinbi[0].add_date) {
@@ -428,7 +480,7 @@ function home(timeout = 0) {
             }
             $.post(url, async (err, resp, data) => {
                 try {
-                    if (logs) $.log(`${O}, 首页信息🚩: ${data}`);
+                    if (logs) $.log(`${O}, 首页信息🚩: ${decodeUnicode(data)}`);
                     $.home = JSON.parse(data);
                     if ($.home.right_jinbi) {
                         console.log(`首页信息：金币：${$.home.right_jinbi}金币,红包：${$.home.hb_jinbi}金币\n`);
@@ -482,7 +534,7 @@ function donejin(timeout = 0) {
             }
             $.post(url, async (err, resp, data) => {
                 try {
-                    if (logs) $.log(`${O}, 步数奖励🚩: ${data}`);
+                    if (logs) $.log(`${O}, 步数奖励🚩: ${decodeUnicode(data)}`);
                     $.donejin = JSON.parse(data);
                     if ($.donejin.code == 1) {
                         console.log(`步数奖励：${$.donejin.tip},${$.donejin.msg}\n`);
@@ -509,7 +561,7 @@ function collsteps(timeout = 0) {
             }
             $.post(url, async (err, resp, data) => {
                 try {
-                    if (logs) $.log(`${O}, 步数金币🚩: ${data}`);
+                    if (logs) $.log(`${O}, 步数金币🚩: ${decodeUnicode(data)}`);
                     $.collsteps = JSON.parse(data);
                     if ($.collsteps.code == 1) {
                         console.log(`步数金币：${$.collsteps.jinbi}金币,${$.collsteps.msg}\n`);
@@ -534,7 +586,7 @@ function step7(timeout = 0) {
             }
             $.post(url, async (err, resp, data) => {
                 try {
-                    if (logs) $.log(`${O}, 7天达标🚩: ${data}`);
+                    if (logs) $.log(`${O}, 7天达标🚩: ${decodeUnicode(data)}`);
                     $.step7 = JSON.parse(data);
                     if (data.match(/month_day/g) && !data.match(/"is_dabiao": 0/g)) {
                         console.log(`7天达标：已达标\n`);
@@ -560,7 +612,7 @@ function callback(timeout = 0) {
             }
             $.post(url, async (err, resp, data) => {
                 try {
-                    if (logs) $.log(`${O}, 附加处理🚩:${data}`);
+                    if (logs) $.log(`${O}, 附加处理🚩:${decodeUnicode(data)}`);
                     $.callback = JSON.parse(data);
                     if ($.callback.code == 1) {
                         console.log(`附加处理：成功\n`);
@@ -586,7 +638,7 @@ function chuansj(timeout = 0) {
             }
             $.post(url, async (err, resp, data) => {
                 try {
-                    if (logs) $.log(`${O}, 前置处理🚩: ${data}`);
+                    if (logs) $.log(`${O}, 前置处理🚩: ${decodeUnicode(data)}`);
                     $.chuansj = JSON.parse(data);
                     if ($.chuansj.code == 1) {
                         console.log(`前置处理：成功\n`);
@@ -612,7 +664,7 @@ function homejin(timeout = 0) {
             }
             $.post(url, async (err, resp, data) => {
                 try {
-                    if (logs) $.log(`${O}, 首页金币🚩: ${data}`);
+                    if (logs) $.log(`${O}, 首页金币🚩: ${decodeUnicode(data)}`);
                     $.homejin = JSON.parse(data);
                     if ($.homejin.code == 1) {
                         console.log(`首页金币：成功领取${$.homejin.jinbi}金币\n`);
@@ -652,7 +704,7 @@ function jindan_click(timeout = 0) {
             }
             $.post(url, async (err, resp, data) => {
                 try {
-                    if (logs) $.log(`${O}, 金蛋前置🚩: ${data}`);
+                    if (logs) $.log(`${O}, 金蛋前置🚩: ${decodeUnicode(data)}`);
                     $.jindan_click = JSON.parse(data);
                     if ($.jindan_click.code == 1) {
                         taskid = $.jindan_click.taskid
@@ -683,7 +735,7 @@ function jindan_done(timeout = 0) {
                 }
                 $.post(url, async (err, resp, data) => {
                     try {
-                        if (logs) $.log(`${O}, 首页金蛋🚩: ${data}`);
+                        if (logs) $.log(`${O}, 首页金蛋🚩: ${decodeUnicode(data)}`);
                         $.jindan_done = JSON.parse(data);
                         if ($.jindan_done.code == 1) {
                             console.log(`首页金蛋：${$.jindan_done.jinbi}金币,领取成功\n`);
@@ -713,7 +765,7 @@ function help_index(timeout = 0) {
             }
             $.post(url, async (err, resp, data) => {
                 try {
-                    if (logs) $.log(`${O}, 助力活动🚩: ${data}`);
+                    if (logs) $.log(`${O}, 助力活动🚩: ${decodeUnicode(data)}`);
                     $.help_index = JSON.parse(data);
                     if ($.help_index.code == 1) {
                         console.log(`助力活动：现金${$.help_index.jinbi}元,差${$.help_index.diff_jinbi}元,时间剩余${($.help_index.time/3600).toFixed(0)}小时\n`);
@@ -746,7 +798,7 @@ function help_click(timeout = 0) {
             }
             $.post(url, async (err, resp, data) => {
                 try {
-                    if (logs) $.log(`${O}, 视频助力🚩: ${data}`);
+                    if (logs) $.log(`${O}, 视频助力🚩: ${decodeUnicode(data)}`);
                     $.help_click = JSON.parse(data);
                     if ($.help_click.code == 1) {
                         console.log(`视频助力：${$.help_click.jinbi/10000}元,领取成功\n`);
@@ -775,7 +827,7 @@ function signget(timeout = 0) {
             }
             $.post(url, async (err, resp, data) => {
                 try {
-                    if (logs) $.log(`${O}, 每日签到🚩: ${data}`);
+                    if (logs) $.log(`${O}, 每日签到🚩: ${decodeUnicode(data)}`);
                     $.signget = JSON.parse(data);
                     if ($.signget.code == 1) {
                         console.log(`每日签到：${$.signget.msg}\n`);
@@ -804,7 +856,7 @@ function sign_html(timeout = 0) {
             }
             $.post(url, async (err, resp, data) => {
                 try {
-                    if (logs) $.log(`${O}, 签到列表🚩: ${data}`);
+                    if (logs) $.log(`${O}, 签到列表🚩: ${decodeUnicode(data)}`);
                     $.sign_html = JSON.parse(data);
                     if ($.sign_html.jinbi_html) {
                         console.log(`签到列表：已签到${$.sign_html.sign_day}天\n`);
@@ -836,7 +888,7 @@ function dk_info(timeout = 0) {
             }
             $.post(url, async (err, resp, data) => {
                 try {
-                    if (logs) $.log(`${O}, 早晚打卡页🚩: ${data}`);
+                    if (logs) $.log(`${O}, 早晚打卡页🚩: ${decodeUnicode(data)}`);
                     $.dk_info = JSON.parse(data);
                     if ($.dk_info.code == 1) {
                         now_time = $.dk_info.now_time
@@ -870,7 +922,7 @@ function dk_click(timeout = 0) {
             }
             $.post(url, async (err, resp, data) => {
                 try {
-                    if (logs) $.log(`${O}, 早晚打卡🚩: ${data}`);
+                    if (logs) $.log(`${O}, 早晚打卡🚩: ${decodeUnicode(data)}`);
                     $.dk_click = JSON.parse(data);
                     if ($.dk_click.code == 1) {
                         console.log(`早晚打卡：获得${$.dk_click.jinbi}金币\n`);
@@ -895,7 +947,7 @@ function cy_info(timeout = 0) {
             }
             $.post(url, async (err, resp, data) => {
                 try {
-                    if (logs) $.log(`${O}, 答题活动页🚩: ${data}`);
+                    if (logs) $.log(`${O}, 答题活动页🚩: ${decodeUnicode(data)}`);
                     $.cy_info = JSON.parse(data);
                     if ($.cy_info.code == 1) {
                         console.log(`答题活动页：剩余${$.cy_info.day_num}次\n`);
@@ -927,7 +979,7 @@ function cy_sp(timeout = 0) {
             }
             $.post(url, async (err, resp, data) => {
                 try {
-                    if (logs) $.log(`${O}, 答题前置🚩: ${data}`);
+                    if (logs) $.log(`${O}, 答题前置🚩: ${decodeUnicode(data)}`);
                     $.cy_sp = JSON.parse(data);
                     if ($.cy_sp.code == 1) {
                         console.log(`答题前置：${$.cy_sp.msg}\n`);
@@ -954,7 +1006,7 @@ function cy_click(timeout = 0) {
             }
             $.post(url, async (err, resp, data) => {
                 try {
-                    if (logs) $.log(`${O}, 答题活动🚩: ${data}`);
+                    if (logs) $.log(`${O}, 答题活动🚩: ${decodeUnicode(data)}`);
                     $.cy_click = JSON.parse(data);
                     if ($.cy_click.code == 1) {
                         console.log(`答题成功：获得${$.cy_click.jinbi}金币\n`);
@@ -983,7 +1035,7 @@ function water_info(timeout = 0) {
             }
             $.post(url, async (err, resp, data) => {
                 try {
-                    if (logs) $.log(`${O}, 每天喝水🚩: ${data}`);
+                    if (logs) $.log(`${O}, 每天喝水🚩: ${decodeUnicode(data)}`);
                     $.water_info = JSON.parse(data);
                     if ($.water_info.code == 1) {
                         day_num = $.water_info.day_num
@@ -1015,7 +1067,7 @@ function water_click(timeout = 0) {
             }
             $.post(url, async (err, resp, data) => {
                 try {
-                    if (logs) $.log(`${O}, 开始喝水🚩: ${data}`);
+                    if (logs) $.log(`${O}, 开始喝水🚩: ${decodeUnicode(data)}`);
                     $.water_click = JSON.parse(data);
                     if ($.water_click.code == 1) {
                         console.log(`${$.water_click.msg}：获得${$.water_click.jinbi}金币\n`);
@@ -1040,7 +1092,7 @@ function sleep_info(timeout = 0) {
             }
             $.post(url, async (err, resp, data) => {
                 try {
-                    if (logs) $.log(`${O}, 睡觉状态🚩: ${data}`);
+                    if (logs) $.log(`${O}, 睡觉状态🚩: ${decodeUnicode(data)}`);
                     $.sleep_info = JSON.parse(data);
                     if ($.sleep_info.is_sleep == 1) {
                         console.log(`睡觉状态：做梦中\n`);
@@ -1075,7 +1127,7 @@ function sleep_start(timeout = 0) {
             }
             $.post(url, async (err, resp, data) => {
                 try {
-                    if (logs) $.log(`${O}, 开始睡觉🚩: ${data}`);
+                    if (logs) $.log(`${O}, 开始睡觉🚩: ${decodeUnicode(data)}`);
                     $.sleep_start = JSON.parse(data);
                     if ($.sleep_start.code == 1) {
                         console.log(`开始睡觉：开始睡觉\n`);
@@ -1100,7 +1152,7 @@ function sleep_end(timeout = 0) {
             }
             $.post(url, async (err, resp, data) => {
                 try {
-                    if (logs) $.log(`${O}, 结束睡觉🚩: ${data}`);
+                    if (logs) $.log(`${O}, 结束睡觉🚩: ${decodeUnicode(data)}`);
                     $.sleep_end = JSON.parse(data);
                     if ($.sleep_end.code == 1) {
                         console.log(`结束睡觉：结束睡觉，产生${$.sleep_end.jinbi}金币\n`);
@@ -1129,7 +1181,7 @@ function sleep_done(timeout = 0) {
             }
             $.post(url, async (err, resp, data) => {
                 try {
-                    if (logs) $.log(`${O}, 睡觉奖励🚩: ${data}`);
+                    if (logs) $.log(`${O}, 睡觉奖励🚩: ${decodeUnicode(data)}`);
                     $.sleep_done = JSON.parse(data);
                     if ($.sleep_done.code == 1) {
                         console.log(`睡觉奖励：睡觉奖励领取${$.sleep_done.jinbi}金币\n`);
@@ -1164,7 +1216,7 @@ function gualist(timeout = 0) {
             }
             $.post(url, async (err, resp, data) => {
                 try {
-                    if (logs) $.log(`${O}, 刮刮卡列表🚩: ${data}`);
+                    if (logs) $.log(`${O}, 刮刮卡列表🚩: ${decodeUnicode(data)}`);
                     $.gualist = JSON.parse(data);
                     if ($.gualist.ka && $.gualist.ka >= 1) {
                         idlist = $.gualist.list.find(item => item.is_ad === '0');
@@ -1197,7 +1249,7 @@ function guadet(timeout = 0) {
             }
             $.post(url, async (err, resp, data) => {
                 try {
-                    if (logs) $.log(`${O}, 刮刮卡🚩: ${data}`);
+                    if (logs) $.log(`${O}, 刮刮卡🚩: ${decodeUnicode(data)}`);
                     $.guadet = JSON.parse(data);
                     if ($.guadet.jine) {
                         guacs = data.match(/x(\d+).png/g).length + 1
@@ -1227,7 +1279,7 @@ function guadet(timeout = 0) {
                                 sign = $.guadet.sign
                                 glid = $.guadet.glid
                                 await guapost() //刮卡奖励
-                            } else if (guacs <= 5  && nowTimes.getHours() == 23) {
+                            } else if (guacs <= 5 && nowTimes.getHours() == 23) {
                                 console.log(`【刮刮卡领取】：成功领奖\n`)
                                 $.message += `【刮刮卡领取】：成功领奖\n`;
                                 sign = $.guadet.sign
@@ -1259,7 +1311,7 @@ function guapost(timeout = 0) {
             }
             $.post(url, async (err, resp, data) => {
                 try {
-                    if (logs) $.log(`${O}, 刮刮卡奖励🚩: ${data}`);
+                    if (logs) $.log(`${O}, 刮刮卡奖励🚩: ${decodeUnicode(data)}`);
                     $.guapost = JSON.parse(data);
                     if ($.guapost.jf) {
                         console.log(`刮刮卡奖励：获得${$.guapost.jf}金币\n`);
@@ -1288,7 +1340,7 @@ function lucky(timeout = 0) {
             }
             $.post(url, async (err, resp, data) => {
                 try {
-                    if (logs) $.log(`${O}, 转盘列表🚩: ${data}`);
+                    if (logs) $.log(`${O}, 转盘列表🚩: ${decodeUnicode(data)}`);
                     $.lucky = JSON.parse(data);
                     if ($.lucky.lucky_num) {
                         console.log(`转盘列表：剩余${$.lucky.lucky_num}次，已运行${$.lucky.lucky_count}次\n`);
@@ -1320,7 +1372,7 @@ function lucky_click(timeout = 0) {
             }
             $.post(url, async (err, resp, data) => {
                 try {
-                    if (logs) $.log(`${O}, 转盘抽奖🚩: ${data}`);
+                    if (logs) $.log(`${O}, 转盘抽奖🚩: ${decodeUnicode(data)}`);
                     $.lucky_click = JSON.parse(data);
                     if ($.lucky_click.jinbi) {
                         console.log(`转盘抽奖：获得${$.lucky_click.jinbi}金币\n`);
@@ -1350,7 +1402,7 @@ function lucky_box(timeout = 0) {
             }
             $.post(url, async (err, resp, data) => {
                 try {
-                    if (logs) $.log(`${O}, 抽奖宝箱🚩: ${data}`);
+                    if (logs) $.log(`${O}, 抽奖宝箱🚩: ${decodeUnicode(data)}`);
                     $.lucky_box = JSON.parse(data);
                     if ($.lucky_box.jinbi) {
                         console.log(`抽奖宝箱：获得${$.lucky_box.jinbi}金币\n`);
@@ -1380,7 +1432,7 @@ function h5_list(timeout = 0) {
             }
             $.post(url, async (err, resp, data) => {
                 try {
-                    if (logs) $.log(`${O}, 看看赚列表🚩: ${data}`);
+                    if (logs) $.log(`${O}, 看看赚列表🚩: ${decodeUnicode(data)}`);
                     $.h5_list = JSON.parse(data);
                     is_ok = $.h5_list.find(item => item.is_ok === 0);
                     if (is_ok) {
@@ -1413,7 +1465,7 @@ function h5_news(timeout = 0) {
             }
             $.post(url, async (err, resp, data) => {
                 try {
-                    if (logs) $.log(`${O}, 看看赚执行🚩: ${data}`);
+                    if (logs) $.log(`${O}, 看看赚执行🚩: ${decodeUnicode(data)}`);
                     $.h5_news = JSON.parse(data);
                     if ($.h5_news.taskid) {
                         console.log(`看看赚执行：下个任务：${$.h5_news.mini_str}\n`);
@@ -1446,7 +1498,7 @@ function h5_h5(timeout = 0) {
             }
             $.get(url, async (err, resp, data) => {
                 try {
-                    if (logs) $.log(`${O}, 看看赚上传🚩: ${data}`);
+                    if (logs) $.log(`${O}, 看看赚上传🚩: ${decodeUnicode(data)}`);
                     $.h5_h5 = JSON.parse(data);
                     console.log(`看看赚：${$.h5_h5.msg}\n`);
                     $.message += `【看看赚】：${$.h5_h5.msg}\n`;
@@ -1476,7 +1528,7 @@ function h5_newsdone(timeout = 0) {
             }
             $.post(url, async (err, resp, data) => {
                 try {
-                    if (logs) $.log(`${O}, 看看赚完成🚩: ${data}`);
+                    if (logs) $.log(`${O}, 看看赚完成🚩: ${decodeUnicode(data)}`);
                     $.h5_newsdone = JSON.parse(data);
                     if ($.h5_newsdone.msg) {
                         console.log(`看看赚完成：${$.h5_newsdone.msg}${$.h5_newsdone.jinbi}金币\n`);
@@ -1505,7 +1557,7 @@ function renwu(timeout = 0) {
             }
             $.post(url, async (err, resp, data) => {
                 try {
-                    if (logs) $.log(`${O}, 赚赚任务🚩: ${data}`);
+                    if (logs) $.log(`${O}, 赚赚任务🚩: ${decodeUnicode(data)}`);
                     $.renwu = JSON.parse(data);
                     if ($.renwu.v_st == 0) {
                         await sp() //看视频
@@ -1541,7 +1593,7 @@ function news(timeout = 0) {
             }
             $.post(url, async (err, resp, data) => {
                 try {
-                    if (logs) $.log(`${O}, 看文章🚩: ${data}`);
+                    if (logs) $.log(`${O}, 看文章🚩: ${decodeUnicode(data)}`);
                     $.news = JSON.parse(data);
                     if ($.news.code == 1 && $.news.is_max == 0) {
                         nonce_str = $.news.nonce_str
@@ -1571,7 +1623,7 @@ function donenews(timeout = 0) {
             }
             $.post(url, async (err, resp, data) => {
                 try {
-                    if (logs) $.log(`${O}, 看文章完成🚩: ${data}`);
+                    if (logs) $.log(`${O}, 看文章完成🚩: ${decodeUnicode(data)}`);
                     $.donenews = JSON.parse(data);
                     if ($.donenews.jinbi) {
                         console.log(`看文章：获得${$.donenews.jinbi}金币，今日获得${$.donenews.day_jinbi}金币\n`);
@@ -1607,7 +1659,7 @@ function admobile_show(timeout = 0) {
             }
             $.post(url, async (err, resp, data) => {
                 try {
-                    if (logs) $.log(`${O}, 激活广告🚩: ${data}`);
+                    if (logs) $.log(`${O}, 激活广告🚩: ${decodeUnicode(data)}`);
                     $.admobile_show = JSON.parse(data);
                     if ($.admobile_show.code == 1) {
                         ad_id = $.admobile_show.ad_id
@@ -1633,7 +1685,7 @@ function admobile_click(timeout = 0) {
             }
             $.post(url, async (err, resp, data) => {
                 try {
-                    if (logs) $.log(`${O}, 点击广告🚩: ${data}`);
+                    if (logs) $.log(`${O}, 点击广告🚩: ${decodeUnicode(data)}`);
                     $.admobile_click = JSON.parse(data);
                     if ($.admobile_click.code == 1) {
                         nonce_str = $.admobile_click.nonce_str
@@ -1659,7 +1711,7 @@ function admobile_done(timeout = 0) {
             }
             $.post(url, async (err, resp, data) => {
                 try {
-                    if (logs) $.log(`${O}, 广告奖励🚩: ${data}`);
+                    if (logs) $.log(`${O}, 广告奖励🚩: ${decodeUnicode(data)}`);
                     $.admobile_done = JSON.parse(data);
                     if ($.admobile_done.code == 1) {
                         console.log(`广告奖励：获得${$.admobile_done.jinbi}金币\n`);
@@ -1684,38 +1736,50 @@ function tixian_html(timeout = 0) {
             }
             $.get(url, async (err, resp, data) => {
                 try {
-                    if (logs) $.log(`${O}, 提现页🚩: ${data}`);
+                    if (logs) $.log(`${O}, 提现页🚩: ${decodeUnicode(data)}`);
                     $.tixian_html = JSON.parse(data);
                     if ($.tixian_html.tixian_html) {
-                       
+
                         jine3 = $.tixian_html.tixian_html.find(item => item.jine === '50');
                         jine4 = $.tixian_html.tixian_html.find(item => item.jine === '100');
                         jine5 = $.tixian_html.tixian_html.find(item => item.jine === '200');
                         day_tixian_tip = $.tixian_html.tixian_html.find(item => item.day_tixian_tip);
-                        fenshu3 = jine3.fenshu_tixian_tip.split('今日剩余')[1].split('份')[0]
-                        fenshu4 = jine4.fenshu_tixian_tip.split('今日剩余')[1].split('份')[0]
-                        fenshu5 = jine5.fenshu_tixian_tip.split('今日剩余')[1].split('份')[0]
+
                         if (day_tixian_tip) {
                             console.log(`提现查询：今日已提现\n`);
                             $.message += `【提现查询】：今日已提现\n`;
                         }
-                        console.log(`${jine3.jine}元：${jine3.fenshu_tixian_tip}\n${jine4.jine}元：${jine4.fenshu_tixian_tip}\n${jine5.jine}元：${jine5.fenshu_tixian_tip}\n`);
-                        $.message += `【${jine3.jine}元】：${jine3.fenshu_tixian_tip}\n【${jine4.jine}元】：${jine4.fenshu_tixian_tip}\n【${jine5.jine}元】：${jine5.fenshu_tixian_tip}\n`;
 
+                        if (jine3 && jine3.fenshu_tixian_tip && jine4 && jine4.fenshu_tixian_tip && jine5 && jine5.fenshu_tixian_tip) {
+
+                            fenshu3 = jine3.fenshu_tixian_tip.split('今日剩余')[1].split('份')[0]
+                            fenshu4 = jine4.fenshu_tixian_tip.split('今日剩余')[1].split('份')[0]
+                            fenshu5 = jine5.fenshu_tixian_tip.split('今日剩余')[1].split('份')[0]
+
+
+
+                            console.log(`${jine3.jine}元：${jine3.fenshu_tixian_tip}\n${jine4.jine}元：${jine4.fenshu_tixian_tip}\n${jine5.jine}元：${jine5.fenshu_tixian_tip}\n`);
+                            $.message += `【${jine3.jine}元】：${jine3.fenshu_tixian_tip}\n【${jine4.jine}元】：${jine4.fenshu_tixian_tip}\n【${jine5.jine}元】：${jine5.fenshu_tixian_tip}\n`;
+                        }
                         if (!day_tixian_tip && ($.user.wx_username != "" || $.user.is_weixin == 1)) {
-                            
-                            if (CASH > 49 && CASH <= 200 && $.user.money >= CASH) {
+
+                            if (CASH == 0.3 && $.user.day_jinbi >= 5000 && $.user.money >= CASH) {
                                 await tixian() //提现
                             }
-                            if (CASH == 888) {
-                                if ($.user.money >= 200 && fenshu5 > 0) {
+                            if (CASH > 0.3 && CASH <= 200 && $.user.money >= CASH) {
+                                await tixian() //提现
+                            }
+                            if (CASH >= 888) {
+                                if ($.user.money >= 200 && fenshu5 && fenshu5 > 0) {
                                     CASH = 200
-                                } else if ($.user.money >= 100 && fenshu4 > 0) {
+                                } else if ($.user.money >= 100 && fenshu4 && fenshu4 > 0) {
                                     CASH = 100
-                                } else if ($.user.money >= 50 && fenshu5 > 0) {
+                                } else if ($.user.money >= 50 && fenshu5 && fenshu5 > 0) {
                                     CASH = 50
-                                } 
-                                if (CASH != 888) {
+                                } else if ($.user.money >= 0.3 && $.user.day_jinbi >= 5000) {
+                                    CASH = 0.3
+                                }
+                                if (CASH <= 888) {
                                     await tixian() //提现
                                 }
                             }
@@ -1741,9 +1805,12 @@ function tixian(timeout = 0) {
             }
             $.post(url, async (err, resp, data) => {
                 try {
-                    if (logs) $.log(`${O}, 现金提现🚩: ${data}`);
+                    if (logs) $.log(`${O}, 现金提现🚩: ${decodeUnicode(data)}`);
                     $.tixian = JSON.parse(data);
                     if ($.tixian.code == 1) {
+                        console.log(`现金提现：${$.tixian.msg}\n`);
+                        $.message += `【现金提现】：${$.tixian.msg}\n`;
+                    } else {
                         console.log(`现金提现：${$.tixian.msg}\n`);
                         $.message += `【现金提现】：${$.tixian.msg}\n`;
                     }
@@ -1756,6 +1823,8 @@ function tixian(timeout = 0) {
         }, timeout)
     })
 }
+
+
 // prettier-ignore
 function Env(t, e) {
     class s {
