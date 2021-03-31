@@ -28,7 +28,7 @@ jobs:
         run: |
           cd ~/App_auto
           npm install
-      - name: '运行 【春风转】'
+      - name: '运行 【葫芦兄弟】'
         run: |
           cd ~/App_auto
           node hl.js
