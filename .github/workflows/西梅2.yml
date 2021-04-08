@@ -1,4 +1,4 @@
-name: 西梅
+name: 西梅2
 
 on:
   workflow_dispatch:
@@ -22,7 +22,7 @@ jobs:
       - name: npm install
         run: |
           npm install
-      - name: '运行 【西梅】'
+      - name: '运行 【西梅2】'
         if: env.XIMEI_HD
         run: |
           node Task/ximei.js
