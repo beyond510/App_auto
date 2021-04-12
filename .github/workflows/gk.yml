@@ -31,7 +31,7 @@ jobs:
       - name: '运行 【番茄看看】'
         if: env.FQKK_HD
         run: |
-          node Task/fqkk.js
+          node Task/fqkk2.js
         env:
           PUSH_KEY: ${{ secrets.PUSH_KEY }}
           BARK_PUSH: ${{ secrets.BARK_PUSH }}
