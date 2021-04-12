@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.repository.owner.id == github.event.sender.id
     env:
-        FQKK: ${{ secrets.FQKK }}    
+        FQKK: ${{ secrets.FQKK2 }}    
         TZ: Asia/shanghai
     steps:
       - name: Checkout
@@ -30,7 +30,7 @@ jobs:
       - name: '运行 【番茄看看】'
         if: env.FQKK_HD
         run: |
-          node Task/fqkk2.js
+          node Task/fqkk.js
         env:
           PUSH_KEY: ${{ secrets.PUSH_KEY }}
           BARK_PUSH: ${{ secrets.BARK_PUSH }}
