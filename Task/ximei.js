@@ -67,19 +67,23 @@ let ximeikey = '',id = '',uid='',tid='',name='',uuid=''
   if (typeof $request !== "undefined") {
     await ximeick()
    
-  } else {ximeiurlArr.push($.getdata('ximeiurl'))
-    ximeihdArr.push($.getdata('ximeihd'))
+  } else {
+    if (process.env.ximeiurl && process.env.ximeiurl.indexOf('\n') > -1) {
+      ximeiurlArr.push(process.env.ximeiurl.split('\n'))
+    } else {
+      ximeiurlArr.push(process.env.ximeiurl.split())
+    };
+    if (process.env.ximeihd && process.env.ximeihd.indexOf('\n') > -1) {
+      ximeihdArr.push(process.env.ximeihd.split('\n'))
+    }  else if(process.env.ximeihd !== undefined) {
+      ximeihdArr.push(process.env.ximeihd.split())
+    };
     let ximeicount = ($.getval('ximeicount') || '1');
-  for (let i = 2; i <= ximeicount; i++) {
-    ximeiurlArr.push($.getdata(`ximeiurl${i}`))
-    ximeihdArr.push($.getdata(`ximeihd${i}`))
-  }
     console.log(`------------- 共${ximeihdArr.length}个账号-------------\n`)
       for (let i = 0; i < ximeihdArr.length; i++) {
         if (ximeihdArr[i]) {
-         
-          ximeiurl = ximeiurlArr[i];
-          ximeihd = ximeihdArr[i];
+          ximeiurl = String(ximeiurlArr[i]);
+          ximeihd = String(ximeihdArr[i]);
           $.index = i + 1;
           console.log(`\n开始【西梅${$.index}】`)
           await ximei1()
